@@ -1,13 +1,12 @@
 const merge = require('webpack-merge');
 const baseConfig = require('./config.base.js');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
-const CreateFileWebpack = require('create-file-webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
@@ -32,10 +31,13 @@ module.exports = merge({
   },
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
+      new TerserPlugin({
         cache: true,
         parallel: true,
-        sourceMap: true, // set to true if you want JS source maps
+        sourceMap: true,
+        terserOptions: {
+          ecma: 6,
+        },
       }),
       new OptimizeCSSAssetsPlugin({}),
     ],
