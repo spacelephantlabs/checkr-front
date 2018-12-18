@@ -1,0 +1,58 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+
+node_modules_cache_key: &node_modules_cache_key
+  v2-dependencies-{{ checksum "yarn.lock" }}
+
+jobs:
+  build:
+    branches:
+        ignore:
+            - gh-pages
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
+    steps:
+
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          key: *node_modules_cache_key
+
+      - run: yarn
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: *node_modules_cache_key
+
+      - run:
+          shell: /bin/sh
+          command: ./.circleci/build.sh
+      - run:
+          shell: /bin/sh
+          command: ./.circleci/deploy.sh
+
+####################################
+## Notifications
+####################################
+# It's a 1.0 CircleCI config, but it's still working
+# See https://discuss.circleci.com/t/experimental-branch-notifications-from-1-0/12964
+experimental:
+  notify:
+    branches:
+      only:
+        - develop
+        - master
